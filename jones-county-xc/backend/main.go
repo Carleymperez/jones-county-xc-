@@ -58,6 +58,9 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 
+	// Health endpoint
+	r.HandleFunc("/health", healthHandler).Methods("GET", "OPTIONS")
+
 	// API routes
 	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/health", healthHandler).Methods("GET", "OPTIONS")
@@ -66,6 +69,6 @@ func main() {
 	// Start server
 	port := ":8080"
 	log.Printf("Server starting on port %s", port)
-	log.Printf("Health check: http://localhost%s/api/health", port)
+	log.Printf("Health check: http://localhost%s/health", port)
 	log.Fatal(http.ListenAndServe(port, r))
 }
