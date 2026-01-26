@@ -1,0 +1,20 @@
+{
+  "name": "jones-county-xc",
+  "version": "1.0.0",
+  "description": "Jones County Cross Country full-stack application",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && go run main.go",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && go build -o bin/server main.go",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && go mod download"
+  },
+  "keywords": [
+    "react",
+    "go",
+    "fullstack"
+  ],
+  "author": "",
+  "license": "ISC"
+}
