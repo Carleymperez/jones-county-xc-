@@ -1,9 +1,16 @@
-name: Deploy to Lightsail
+name: Deploy Frontend
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -17,11 +24,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: cd frontend && npm ci
 
-      - name: Build frontend
+      - name: Build
         run: cd frontend && npm run build
 
       - name: Set up SSH key
@@ -34,11 +43,3 @@ jobs:
       - name: Deploy frontend
         run: |
           scp -i ~/.ssh/deploy_key -r frontend/dist/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/var/www/jones-county-xc/frontend/
-
-      - name: Deploy backend
-        run: |
-          scp -i ~/.ssh/deploy_key -r backend/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/var/www/jones-county-xc/backend/
-
-      - name: Restart backend service
-        run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /var/www/jones-county-xc/backend && export PATH=\$PATH:/usr/local/go/bin && go mod download && sudo systemctl restart jones-county-xc"
