@@ -7,7 +7,7 @@ Complete guide for deploying the Jones County XC application to AWS Lightsail.
 This guide will help you set up:
 - **Go Backend API** - Running on port 8080
 - **React Frontend** - Static files served by nginx on port 80
-- **MySQL Database** - For data storage
+- **SQLite Database** - File-based storage (no separate service needed)
 
 ## Prerequisites
 
@@ -45,40 +45,16 @@ source ~/.bashrc
 go version
 ```
 
-### Step 3: Install MySQL
+### Step 3: Install SQLite
 
 ```bash
-# Install MySQL Server
-sudo apt install mysql-server -y
+sudo apt install sqlite3 -y
 
-# Secure MySQL installation
-sudo mysql_secure_installation
-
-# Start and enable MySQL
-sudo systemctl start mysql
-sudo systemctl enable mysql
-
-# Check status
-sudo systemctl status mysql
+# Verify installation
+sqlite3 --version
 ```
 
-### Step 4: Configure MySQL
-
-```bash
-# Login to MySQL as root
-sudo mysql
-
-# In MySQL prompt, run:
-CREATE DATABASE jones_county_xc;
-CREATE USER 'jones_xc_user'@'localhost' IDENTIFIED BY 'your_secure_password_here';
-GRANT ALL PRIVILEGES ON jones_county_xc.* TO 'jones_xc_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-**Important:** Replace `your_secure_password_here` with a strong password!
-
-### Step 5: Configure Nginx
+### Step 4: Configure Nginx
 
 We'll configure nginx to:
 - Serve React frontend static files
@@ -141,7 +117,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### Step 6: Set Up Application Directories
+### Step 5: Set Up Application Directories
 
 ```bash
 # Create application directory
@@ -151,7 +127,7 @@ sudo mkdir -p /var/www/jones-county-xc/{frontend,backend}
 sudo chown -R ubuntu:ubuntu /var/www/jones-county-xc
 ```
 
-### Step 7: Create Systemd Service for Go Backend
+### Step 6: Create Systemd Service for Go Backend
 
 ```bash
 sudo nano /etc/systemd/system/jones-county-xc.service
@@ -162,26 +138,20 @@ Add this configuration:
 ```ini
 [Unit]
 Description=Jones County XC Backend API
-After=network.target mysql.service
+After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
 WorkingDirectory=/var/www/jones-county-xc/backend
 Environment="PORT=8080"
-Environment="DB_HOST=localhost"
-Environment="DB_USER=jones_xc_user"
-Environment="DB_PASSWORD=your_secure_password_here"
-Environment="DB_NAME=jones_county_xc"
-ExecStart=/usr/local/go/bin/go run main.go
+ExecStart=/var/www/jones-county-xc/backend/jones-county-xc
 Restart=always
 RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
 ```
-
-**Important:** Update the `DB_PASSWORD` environment variable with your MySQL password!
 
 Enable and start the service:
 
@@ -199,7 +169,7 @@ sudo systemctl start jones-county-xc
 sudo systemctl status jones-county-xc
 ```
 
-### Step 8: Configure Firewall
+### Step 7: Configure Firewall
 
 ```bash
 # Check if UFW is active
@@ -225,7 +195,7 @@ sudo ufw status
 - Go to Lightsail → Your Instance → Networking
 - Add firewall rules for HTTP (80) and HTTPS (443)
 
-### Step 9: Deploy Your Code
+### Step 8: Deploy Your Code
 
 #### Deploy Frontend:
 
@@ -241,19 +211,26 @@ scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem -r dist/* ubuntu@3.217.16.76:/va
 
 #### Deploy Backend:
 
+The backend is deployed automatically via GitHub Actions CI/CD pipeline. On push to `main`, it:
+1. Builds the Go binary with `CGO_ENABLED=0`
+2. Copies the binary to the server
+3. Restarts the systemd service
+
+For manual deployment:
+
 ```bash
-# On your local machine, copy backend code
-scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem -r backend/* ubuntu@3.217.16.76:/var/www/jones-county-xc/backend/
+# On your local machine, build the binary
+cd ~/projects/jones-county-xc/backend
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o jones-county-xc .
 
-# SSH into server
-ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem ubuntu@3.217.16.76
+# Copy binary to server
+scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem jones-county-xc ubuntu@3.217.16.76:/var/www/jones-county-xc/backend/
 
-# On server, install Go dependencies
-cd /var/www/jones-county-xc/backend
-go mod download
+# Restart the service
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem ubuntu@3.217.16.76 "sudo systemctl restart jones-county-xc"
 ```
 
-### Step 10: Restart Services
+### Step 9: Restart Services
 
 ```bash
 # Restart backend service
@@ -277,9 +254,9 @@ sudo systemctl status nginx
 2. **Check Frontend:**
    Open `http://3.217.16.76` in your browser
 
-3. **Check MySQL:**
+3. **Check SQLite Database:**
    ```bash
-   sudo mysql -u jones_xc_user -p jones_county_xc
+   sqlite3 /var/www/jones-county-xc/backend/data.db ".tables"
    ```
 
 ## Useful Commands
@@ -303,35 +280,40 @@ sudo systemctl restart nginx
 ```bash
 sudo systemctl status jones-county-xc
 sudo systemctl status nginx
-sudo systemctl status mysql
+```
+
+### Inspect Database:
+```bash
+sqlite3 /var/www/jones-county-xc/backend/data.db
 ```
 
 ## Troubleshooting
 
 ### Backend not starting:
 - Check logs: `sudo journalctl -u jones-county-xc -n 50`
-- Verify Go is installed: `go version`
+- Verify binary exists: `ls -la /var/www/jones-county-xc/backend/jones-county-xc`
 - Check if port 8080 is in use: `sudo netstat -tulpn | grep 8080`
 
 ### Nginx errors:
 - Test config: `sudo nginx -t`
 - Check logs: `sudo tail -f /var/log/nginx/error.log`
 
-### MySQL connection issues:
-- Verify MySQL is running: `sudo systemctl status mysql`
-- Test connection: `mysql -u jones_xc_user -p`
+### SQLite issues:
+- Check database file exists: `ls -la /var/www/jones-county-xc/backend/data.db`
+- Verify permissions: the `ubuntu` user must own the backend directory
+- Test database: `sqlite3 /var/www/jones-county-xc/backend/data.db "SELECT 1;"`
 
 ## Security Considerations
 
-1. **Change default MySQL password**
-2. **Use environment variables for secrets** (consider using a secrets manager)
-3. **Set up SSL/HTTPS** (Let's Encrypt with Certbot)
-4. **Regular security updates**: `sudo apt update && sudo apt upgrade`
-5. **Backup database regularly**
+1. **Use environment variables for secrets** (consider using a secrets manager)
+2. **Set up SSL/HTTPS** (Let's Encrypt with Certbot)
+3. **Regular security updates**: `sudo apt update && sudo apt upgrade`
+4. **Backup database regularly**: `cp data.db data.db.backup`
+5. **Restrict file permissions** on `data.db` to the service user
 
 ## Next Steps
 
 - Set up SSL certificate with Let's Encrypt
-- Configure automated backups
+- Configure automated backups for `data.db`
 - Set up monitoring and logging
 - Configure CI/CD pipeline

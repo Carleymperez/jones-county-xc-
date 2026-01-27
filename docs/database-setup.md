@@ -1,35 +1,59 @@
 # Database Setup
 
-## Current Setup: SQLite
+## SQLite
 
-Due to the small memory footprint of your Lightsail instance (416MB), we're using **SQLite** instead of MySQL. SQLite is:
+Due to the small memory footprint of the Lightsail instance (416MB), the backend uses **SQLite** via the pure-Go driver [`modernc.org/sqlite`](https://pkg.go.dev/modernc.org/sqlite). SQLite is:
 - Lightweight (no separate service needed)
 - Perfect for small to medium applications
 - File-based (easy backups)
 - No configuration required
+- Compatible with `CGO_ENABLED=0` builds (pure Go, no C compiler needed)
 
-## If You Need MySQL Later
+## How It Works
 
-If you need MySQL in the future, you have these options:
+The backend initializes SQLite on startup in `main.go`:
+1. Opens (or creates) `data.db` in the working directory
+2. Enables WAL mode for better read concurrency
+3. Runs schema migrations to create tables
 
-### Option 1: Upgrade Lightsail Instance
-- Upgrade to at least 1GB RAM instance ($5/month)
-- Then MySQL will run without issues
-
-### Option 2: Use AWS RDS
-- Managed MySQL service
-- Separate from your Lightsail instance
-- More expensive but fully managed
-
-### Option 3: Use MariaDB
-- Lighter than MySQL
-- May work on 512MB instances with tuning
-
-## SQLite Usage
-
-SQLite is already configured in the backend. The database file will be created at:
+On the server, the database file lives at:
 ```
 /var/www/jones-county-xc/backend/data.db
 ```
 
-No additional setup is needed - SQLite works out of the box!
+## Backups
+
+SQLite databases are single files, so backups are straightforward:
+
+```bash
+# Simple file copy (stop service first for consistency)
+sudo systemctl stop jones-county-xc
+cp /var/www/jones-county-xc/backend/data.db /var/www/jones-county-xc/backend/data.db.backup
+sudo systemctl start jones-county-xc
+
+# Or use SQLite's built-in backup (safe while running)
+sqlite3 /var/www/jones-county-xc/backend/data.db ".backup /tmp/data.db.backup"
+```
+
+## Local Development
+
+No setup needed. Running the backend locally creates a `data.db` file in the `backend/` directory:
+
+```bash
+cd backend
+go run .
+# data.db is created automatically
+```
+
+## Inspecting the Database
+
+```bash
+# List tables
+sqlite3 data.db ".tables"
+
+# Show schema
+sqlite3 data.db ".schema"
+
+# Run a query
+sqlite3 data.db "SELECT * FROM athletes;"
+```

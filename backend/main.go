@@ -1,12 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
+	_ "modernc.org/sqlite"
 )
 
 type HealthResponse struct {
@@ -55,7 +57,37 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func initDB() *sql.DB {
+	db, err := sql.Open("sqlite", "data.db")
+	if err != nil {
+		log.Fatalf("Failed to open database: %v", err)
+	}
+
+	// Enable WAL mode for better concurrent read performance
+	if _, err := db.Exec("PRAGMA journal_mode=WAL"); err != nil {
+		log.Fatalf("Failed to set journal mode: %v", err)
+	}
+
+	// Create schema
+	schema := `
+	CREATE TABLE IF NOT EXISTS athletes (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		grade INTEGER,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);`
+	if _, err := db.Exec(schema); err != nil {
+		log.Fatalf("Failed to create schema: %v", err)
+	}
+
+	log.Println("Database initialized successfully")
+	return db
+}
+
 func main() {
+	db := initDB()
+	defer db.Close()
+
 	r := mux.NewRouter()
 
 	// Health endpoint

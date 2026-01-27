@@ -30,18 +30,16 @@ else
 fi
 go version
 
-# Step 3: Install MySQL
+# Step 3: Install SQLite
 echo ""
-echo "Step 3: Installing MySQL..."
-if ! command -v mysql &> /dev/null; then
-    sudo apt install mysql-server -y
-    sudo systemctl start mysql
-    sudo systemctl enable mysql
-    echo "MySQL installed successfully"
-    echo "IMPORTANT: Run 'sudo mysql_secure_installation' to secure MySQL"
+echo "Step 3: Installing SQLite..."
+if ! command -v sqlite3 &> /dev/null; then
+    sudo apt install sqlite3 -y
+    echo "SQLite installed successfully"
 else
-    echo "MySQL is already installed"
+    echo "SQLite is already installed"
 fi
+sqlite3 --version
 
 # Step 4: Create application directories
 echo ""
@@ -63,8 +61,6 @@ echo ""
 echo "=== Setup Complete! ==="
 echo ""
 echo "Next steps:"
-echo "1. Secure MySQL: sudo mysql_secure_installation"
-echo "2. Create database and user (see deployment guide)"
-echo "3. Configure nginx (see deployment guide)"
-echo "4. Create systemd service (see deployment guide)"
-echo "5. Deploy your code"
+echo "1. Configure nginx (see deployment guide)"
+echo "2. Create systemd service (see deployment guide)"
+echo "3. Deploy your code (the SQLite database is created automatically on first run)"
