@@ -23,6 +23,13 @@ Jones County XC is a full-stack web application with a clear separation between 
 │   Backend (Go)          │
 │   - Port 8080           │
 │   - HTTP Server         │
+└──────┬──────────────────┘
+       │ SQL
+       │
+┌──────▼──────────────────┐
+│   SQLite Database       │
+│   - data.db             │
+│   - WAL mode            │
 └─────────────────────────┘
 ```
 
@@ -38,7 +45,8 @@ Jones County XC is a full-stack web application with a clear separation between 
 
 - **Language**: Go 1.21+
 - **Router**: Gorilla Mux for HTTP routing
-- **API Design**: RESTful endpoints
+- **Database**: SQLite via `modernc.org/sqlite` (pure Go, no CGO)
+- **API Design**: RESTful JSON endpoints
 - **CORS**: Enabled for frontend communication
 
 ## Data Flow
@@ -51,8 +59,7 @@ Jones County XC is a full-stack web application with a clear separation between 
 
 ## Future Considerations
 
-- Database integration (PostgreSQL, MySQL, etc.)
+- Database-backed athlete CRUD (currently hardcoded)
 - Authentication/Authorization (JWT, OAuth)
+- Meet/race results tracking
 - File storage (S3, local storage)
-- Caching layer (Redis)
-- Message queue (RabbitMQ, Kafka)

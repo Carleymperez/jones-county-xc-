@@ -26,6 +26,35 @@ Check if the backend server is running.
 
 ---
 
+### List Athletes
+
+**GET** `/api/athletes`
+
+Returns all athletes with their name, grade, and personal record.
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Jake Thompson",
+    "grade": 11,
+    "personal_record": "16:42"
+  },
+  {
+    "id": 2,
+    "name": "Maria Garcia",
+    "grade": 10,
+    "personal_record": "19:15"
+  }
+]
+```
+
+**Status Codes:**
+- `200 OK` - Returns array of athletes
+
+---
+
 ### General API Endpoint
 
 **GET/POST/PUT/DELETE** `/api/*`
@@ -57,7 +86,6 @@ Error responses follow this format:
 
 ## Future Endpoints
 
-- User management endpoints
-- Data CRUD operations
+- Athlete CRUD operations (POST, PUT, DELETE)
 - Authentication endpoints
-- File upload endpoints
+- Meet/race results endpoints

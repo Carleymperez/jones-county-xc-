@@ -6,6 +6,7 @@ This folder contains project documentation.
 
 - `api.md` - API documentation
 - `architecture.md` - System architecture overview
+- `database-setup.md` - Database setup and management
 - `deployment.md` - Deployment instructions
 - `development.md` - Development guidelines
 
