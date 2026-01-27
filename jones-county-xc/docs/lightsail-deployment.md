@@ -14,7 +14,7 @@ This guide will help you set up:
 - AWS Lightsail instance running Ubuntu 24.04
 - SSH access to your server
 - Your SSH key: `~/.ssh/LightsailDefaultKey-us-east-1.pem`
-- Server IP: `44.200.76.247`
+- Server IP: `3.217.16.76`
 
 ## Step-by-Step Setup
 
@@ -94,7 +94,7 @@ Add this configuration:
 ```nginx
 server {
     listen 80;
-    server_name 44.200.76.247;
+    server_name 3.217.16.76;
 
     # Serve React frontend
     root /var/www/jones-county-xc/frontend;
@@ -236,17 +236,17 @@ npm install
 npm run build
 
 # Copy build to server
-scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem -r dist/* ubuntu@44.200.76.247:/var/www/jones-county-xc/frontend/
+scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem -r dist/* ubuntu@3.217.16.76:/var/www/jones-county-xc/frontend/
 ```
 
 #### Deploy Backend:
 
 ```bash
 # On your local machine, copy backend code
-scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem -r backend/* ubuntu@44.200.76.247:/var/www/jones-county-xc/backend/
+scp -i ~/.ssh/LightsailDefaultKey-us-east-1.pem -r backend/* ubuntu@3.217.16.76:/var/www/jones-county-xc/backend/
 
 # SSH into server
-ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem ubuntu@44.200.76.247
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem ubuntu@3.217.16.76
 
 # On server, install Go dependencies
 cd /var/www/jones-county-xc/backend
@@ -275,7 +275,7 @@ sudo systemctl status nginx
    ```
 
 2. **Check Frontend:**
-   Open `http://44.200.76.247` in your browser
+   Open `http://3.217.16.76` in your browser
 
 3. **Check MySQL:**
    ```bash

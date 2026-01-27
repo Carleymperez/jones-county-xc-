@@ -5,7 +5,7 @@
 
 set -e
 
-SERVER_IP="44.200.76.247"
+SERVER_IP="3.217.16.76"
 SSH_KEY="$HOME/.ssh/LightsailDefaultKey-us-east-1.pem"
 REMOTE_PATH="/var/www/jones-county-xc/frontend"
 
