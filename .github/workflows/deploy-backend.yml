@@ -45,7 +45,8 @@ jobs:
 
       - name: Deploy binary
         run: |
-          scp -i ~/.ssh/deploy_key backend/jones-county-xc ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/var/www/jones-county-xc/backend/jones-county-xc
+          scp -i ~/.ssh/deploy_key backend/jones-county-xc ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/tmp/jones-county-xc
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo mv /tmp/jones-county-xc /var/www/jones-county-xc/backend/jones-county-xc && sudo chmod +x /var/www/jones-county-xc/backend/jones-county-xc"
 
       - name: Restart service
         run: |
