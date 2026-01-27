@@ -11,6 +11,13 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+type Athlete struct {
+	ID             int    `json:"id"`
+	Name           string `json:"name"`
+	Grade          int    `json:"grade"`
+	PersonalRecord string `json:"personal_record"`
+}
+
 type HealthResponse struct {
 	Status    string    `json:"status"`
 	Message   string    `json:"message"`
@@ -35,6 +42,28 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(response)
+}
+
+func athletesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	athletes := []Athlete{
+		{ID: 1, Name: "Jake Thompson", Grade: 11, PersonalRecord: "16:42"},
+		{ID: 2, Name: "Maria Garcia", Grade: 10, PersonalRecord: "19:15"},
+		{ID: 3, Name: "Ethan Williams", Grade: 12, PersonalRecord: "16:05"},
+		{ID: 4, Name: "Sophie Chen", Grade: 9, PersonalRecord: "20:30"},
+		{ID: 5, Name: "Liam Johnson", Grade: 11, PersonalRecord: "17:18"},
+	}
+
+	json.NewEncoder(w).Encode(athletes)
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +125,7 @@ func main() {
 	// API routes
 	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/health", healthHandler).Methods("GET", "OPTIONS")
+	api.HandleFunc("/athletes", athletesHandler).Methods("GET", "OPTIONS")
 	api.HandleFunc("/", apiHandler).Methods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 
 	// Start server

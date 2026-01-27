@@ -38,6 +38,11 @@ coverage/
 # Private keys
 *.pem
 
+# Database
+*.db
+*.db-shm
+*.db-wal
+
 # Temporary files
 tmp/
 temp/
