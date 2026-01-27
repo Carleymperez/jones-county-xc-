@@ -35,6 +35,9 @@ logs/
 coverage/
 *.out
 
+# Private keys
+*.pem
+
 # Temporary files
 tmp/
 temp/
