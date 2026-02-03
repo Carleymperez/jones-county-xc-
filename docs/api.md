@@ -37,15 +37,15 @@ Returns all athletes with their name, grade, and personal record.
 [
   {
     "id": 1,
-    "name": "Jake Thompson",
+    "name": "Alex Johnson",
     "grade": 11,
-    "personal_record": "16:42"
+    "personal_record": "16:45"
   },
   {
     "id": 2,
-    "name": "Maria Garcia",
+    "name": "Sam Williams",
     "grade": 10,
-    "personal_record": "19:15"
+    "personal_record": "17:02"
   }
 ]
 ```

@@ -44,10 +44,10 @@ Jones County XC is a full-stack web application with a clear separation between 
 ## Backend Architecture
 
 - **Language**: Go 1.21+
-- **Router**: Gorilla Mux for HTTP routing
+- **Router**: Gin web framework
 - **Database**: SQLite via `modernc.org/sqlite` (pure Go, no CGO)
 - **API Design**: RESTful JSON endpoints
-- **CORS**: Enabled for frontend communication
+- **CORS**: Handled via `gin-contrib/cors` middleware
 
 ## Data Flow
 

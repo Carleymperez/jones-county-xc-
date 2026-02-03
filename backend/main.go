@@ -2,12 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
-	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	_ "modernc.org/sqlite"
 )
 
@@ -18,72 +17,20 @@ type Athlete struct {
 	PersonalRecord string `json:"personal_record"`
 }
 
-type HealthResponse struct {
-	Status    string    `json:"status"`
-	Message   string    `json:"message"`
-	Timestamp time.Time `json:"timestamp"`
-}
-
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	response := HealthResponse{
-		Status:    "healthy",
-		Message:   "Backend server is running!",
-		Timestamp: time.Now(),
-	}
-
-	json.NewEncoder(w).Encode(response)
-}
-
-func athletesHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
+func GetAthletes(c *gin.Context) {
 	athletes := []Athlete{
-		{ID: 1, Name: "Jake Thompson", Grade: 11, PersonalRecord: "16:42"},
-		{ID: 2, Name: "Maria Garcia", Grade: 10, PersonalRecord: "19:15"},
-		{ID: 3, Name: "Ethan Williams", Grade: 12, PersonalRecord: "16:05"},
-		{ID: 4, Name: "Sophie Chen", Grade: 9, PersonalRecord: "20:30"},
-		{ID: 5, Name: "Liam Johnson", Grade: 11, PersonalRecord: "17:18"},
+		{ID: 1, Name: "Alex Johnson", Grade: 11, PersonalRecord: "16:45"},
+		{ID: 2, Name: "Sam Williams", Grade: 10, PersonalRecord: "17:02"},
 	}
-
-	json.NewEncoder(w).Encode(athletes)
+	c.JSON(200, athletes)
 }
 
-func apiHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	response := map[string]interface{}{
-		"message": "API endpoint is working",
-		"method":  r.Method,
-		"path":    r.URL.Path,
-	}
-
-	json.NewEncoder(w).Encode(response)
+func HealthCheck(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status":    "healthy",
+		"message":   "Backend server is running!",
+		"timestamp": time.Now(),
+	})
 }
 
 func initDB() *sql.DB {
@@ -117,20 +64,18 @@ func main() {
 	db := initDB()
 	defer db.Close()
 
-	r := mux.NewRouter()
+	r := gin.Default()
 
-	// Health endpoint
-	r.HandleFunc("/health", healthHandler).Methods("GET", "OPTIONS")
+	r.Use(cors.Default())
 
-	// API routes
-	api := r.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/health", healthHandler).Methods("GET", "OPTIONS")
-	api.HandleFunc("/athletes", athletesHandler).Methods("GET", "OPTIONS")
-	api.HandleFunc("/", apiHandler).Methods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	r.GET("/health", HealthCheck)
 
-	// Start server
-	port := ":8080"
-	log.Printf("Server starting on port %s", port)
-	log.Printf("Health check: http://localhost%s/health", port)
-	log.Fatal(http.ListenAndServe(port, r))
+	api := r.Group("/api")
+	{
+		api.GET("/health", HealthCheck)
+		api.GET("/athletes", GetAthletes)
+	}
+
+	log.Println("Server starting on port :8080")
+	r.Run(":8080")
 }
