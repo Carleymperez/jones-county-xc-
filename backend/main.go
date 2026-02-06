@@ -11,18 +11,88 @@ import (
 )
 
 type Athlete struct {
-	ID             int    `json:"id"`
-	Name           string `json:"name"`
-	Grade          int    `json:"grade"`
-	PersonalRecord string `json:"personal_record"`
+	ID             int     `json:"id"`
+	Name           string  `json:"name"`
+	Grade          *int    `json:"grade"`
+	PersonalRecord *string `json:"personal_record"`
+	Events         *string `json:"events"`
 }
 
+type Meet struct {
+	ID       int     `json:"id"`
+	Name     string  `json:"name"`
+	Date     *string `json:"date"`
+	Location *string `json:"location"`
+}
+
+type Result struct {
+	ID        int     `json:"id"`
+	AthleteID *int    `json:"athleteId"`
+	MeetID    *int    `json:"meetId"`
+	Time      *string `json:"time"`
+	Place     *int    `json:"place"`
+}
+
+var db *sql.DB
+
 func GetAthletes(c *gin.Context) {
-	athletes := []Athlete{
-		{ID: 1, Name: "Alex Johnson", Grade: 11, PersonalRecord: "16:45"},
-		{ID: 2, Name: "Sam Williams", Grade: 10, PersonalRecord: "17:02"},
+	rows, err := db.Query("SELECT id, name, grade, personal_record, events FROM athletes")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var athletes []Athlete
+	for rows.Next() {
+		var a Athlete
+		if err := rows.Scan(&a.ID, &a.Name, &a.Grade, &a.PersonalRecord, &a.Events); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		athletes = append(athletes, a)
 	}
 	c.JSON(200, athletes)
+}
+
+func GetMeets(c *gin.Context) {
+	rows, err := db.Query("SELECT id, name, date, location FROM meets")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var meets []Meet
+	for rows.Next() {
+		var m Meet
+		if err := rows.Scan(&m.ID, &m.Name, &m.Date, &m.Location); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		meets = append(meets, m)
+	}
+	c.JSON(200, meets)
+}
+
+func GetResults(c *gin.Context) {
+	rows, err := db.Query("SELECT id, athlete_id, meet_id, time, place FROM results")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var results []Result
+	for rows.Next() {
+		var r Result
+		if err := rows.Scan(&r.ID, &r.AthleteID, &r.MeetID, &r.Time, &r.Place); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		results = append(results, r)
+	}
+	c.JSON(200, results)
 }
 
 func HealthCheck(c *gin.Context) {
@@ -33,8 +103,9 @@ func HealthCheck(c *gin.Context) {
 	})
 }
 
-func initDB() *sql.DB {
-	db, err := sql.Open("sqlite", "data.db")
+func initDB() {
+	var err error
+	db, err = sql.Open("sqlite", "data.db")
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
@@ -44,24 +115,16 @@ func initDB() *sql.DB {
 		log.Fatalf("Failed to set journal mode: %v", err)
 	}
 
-	// Create schema
-	schema := `
-	CREATE TABLE IF NOT EXISTS athletes (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL,
-		grade INTEGER,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-	);`
-	if _, err := db.Exec(schema); err != nil {
-		log.Fatalf("Failed to create schema: %v", err)
+	// Enable foreign keys
+	if _, err := db.Exec("PRAGMA foreign_keys=ON"); err != nil {
+		log.Fatalf("Failed to enable foreign keys: %v", err)
 	}
 
 	log.Println("Database initialized successfully")
-	return db
 }
 
 func main() {
-	db := initDB()
+	initDB()
 	defer db.Close()
 
 	r := gin.Default()
@@ -74,6 +137,8 @@ func main() {
 	{
 		api.GET("/health", HealthCheck)
 		api.GET("/athletes", GetAthletes)
+		api.GET("/meets", GetMeets)
+		api.GET("/results", GetResults)
 	}
 
 	log.Println("Server starting on port :8080")

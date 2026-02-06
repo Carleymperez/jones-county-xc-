@@ -1,25 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+
+async function fetchAthletes() {
+  const res = await fetch('/api/athletes')
+  if (!res.ok) throw new Error('Failed to fetch athletes')
+  return res.json()
+}
 
 function App() {
-  const [athletes, setAthletes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    fetch('/api/athletes')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch athletes')
-        return res.json()
-      })
-      .then(data => {
-        setAthletes(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [])
+  const { data: athletes = [], isLoading, error } = useQuery({
+    queryKey: ['athletes'],
+    queryFn: fetchAthletes,
+  })
 
   return (
     <div className="min-h-screen bg-blue-800 flex flex-col items-center text-white">
@@ -40,10 +31,10 @@ function App() {
       <div className="w-full max-w-2xl px-4 pb-12">
         <h2 className="text-2xl font-semibold text-yellow-400 mb-4">Athletes</h2>
 
-        {loading && <p className="text-blue-200">Loading athletes...</p>}
-        {error && <p className="text-red-300">Error: {error}</p>}
+        {isLoading && <p className="text-blue-200">Loading athletes...</p>}
+        {error && <p className="text-red-300">Error: {error.message}</p>}
 
-        {!loading && !error && (
+        {!isLoading && !error && (
           <div className="bg-blue-900 rounded-lg overflow-hidden shadow-lg">
             <table className="w-full text-left">
               <thead>
