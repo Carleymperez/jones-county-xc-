@@ -7,7 +7,7 @@ function TodayDate() {
   })
 
   return (
-    <p className="text-gray-600 text-sm mb-8">{today}</p>
+    <p className="text-green-200 text-sm mt-4">{today}</p>
   )
 }
 
