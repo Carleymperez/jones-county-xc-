@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button'
-
 function StopwatchIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -25,7 +23,7 @@ function AthleteCard({ name, grade, time }) {
         <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">5K PR</span>
         <span className="text-lg font-semibold">{time}</span>
       </div>
-      <Button variant="outline" size="sm" className="w-full border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-gray-900">View Details</Button>
+      <button className="w-full bg-green-600 text-white hover:bg-green-700 text-sm font-medium py-2 rounded-lg transition-colors">View Details</button>
     </div>
   )
 }

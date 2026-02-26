@@ -17,16 +17,16 @@ const CATEGORIES = [
 function RaceCategorySelect({ value, onChange }) {
   return (
     <div className="flex items-center gap-3">
-      <label className="text-sm font-medium text-blue-200 whitespace-nowrap">
+      <label className="text-sm font-medium text-gray-600 whitespace-nowrap">
         Race Category
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-48 bg-blue-900 border-blue-700 text-white">
+        <SelectTrigger className="w-48 bg-white border border-gray-300 text-gray-900">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
-        <SelectContent className="bg-blue-900 border-blue-700 text-white">
+        <SelectContent>
           {CATEGORIES.map(cat => (
-            <SelectItem key={cat.value} value={cat.value} className="text-white focus:bg-blue-700 focus:text-white">
+            <SelectItem key={cat.value} value={cat.value}>
               {cat.label}
             </SelectItem>
           ))}

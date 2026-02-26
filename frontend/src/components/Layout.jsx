@@ -7,7 +7,7 @@ function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-blue-800 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Desktop sidebar — always visible md and up */}
       <div className="hidden md:flex shrink-0">
         <Sidebar />
@@ -31,10 +31,10 @@ function Layout() {
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0">
         {/* Mobile top bar with hamburger */}
-        <div className="md:hidden flex items-center gap-3 bg-blue-950 border-b border-blue-800 px-4 py-3">
+        <div className="md:hidden flex items-center gap-3 bg-green-950 border-b border-green-900 px-4 py-3">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-blue-200 hover:text-white transition-colors"
+            className="text-green-300 hover:text-white transition-colors"
             aria-label="Open sidebar"
           >
             <Menu size={22} />

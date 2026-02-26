@@ -19,21 +19,21 @@ function CalendarIcon() {
 function UpcomingMeets() {
   return (
     <div className="w-full max-w-2xl px-4 pb-12">
-      <h2 className="text-2xl font-semibold text-yellow-400 mb-4">Upcoming Meets</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-green-700 mb-4">Upcoming Meets</h2>
       <div className="flex flex-col gap-3">
         {PLACEHOLDER_MEETS.map(meet => (
           <div
             key={meet.id}
-            className="bg-blue-900 rounded-lg px-6 py-4 shadow cursor-pointer
-                       hover:bg-blue-800 hover:shadow-lg hover:scale-[1.01]
+            className="bg-white border border-gray-200 border-l-4 border-l-green-500 rounded-xl px-6 py-4 shadow-sm cursor-pointer
+                       hover:shadow-md hover:border-green-500
                        active:scale-[0.99] transition-all duration-150
                        flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">
-              <p className="font-semibold text-white truncate">{meet.name}</p>
-              <p className="text-blue-300 text-sm truncate">{meet.location}</p>
+              <p className="font-semibold text-gray-900 truncate">{meet.name}</p>
+              <p className="text-gray-500 text-sm truncate">{meet.location}</p>
             </div>
-            <div className="flex items-center gap-1.5 text-yellow-400 text-sm font-medium shrink-0">
+            <div className="flex items-center gap-1.5 text-green-700 text-sm font-medium shrink-0">
               <CalendarIcon />
               {meet.date}
             </div>

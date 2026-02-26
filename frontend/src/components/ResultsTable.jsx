@@ -17,19 +17,19 @@ function ResultsTable() {
 
   return (
     <div className="w-full max-w-2xl px-4 pb-12">
-      <h2 className="text-2xl font-semibold text-yellow-400 mb-4">Results</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-green-700 mb-4">Results</h2>
 
-      {isLoading && <p className="text-blue-200">Loading results...</p>}
+      {isLoading && <p className="text-gray-400">Loading results...</p>}
 
       {!isLoading && rows.length === 0 && (
-        <p className="text-blue-300">No results recorded yet.</p>
+        <p className="text-gray-400">No results recorded yet.</p>
       )}
 
       {rows.length > 0 && (
-        <div className="bg-blue-900 rounded-lg overflow-hidden shadow-lg">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-blue-950 text-yellow-400 text-sm uppercase tracking-wider">
+              <tr className="bg-gray-50 border-b border-gray-200 text-green-700 text-xs uppercase tracking-wider">
                 <th className="px-6 py-3">Place</th>
                 <th className="px-6 py-3">Athlete</th>
                 <th className="px-6 py-3">Meet</th>
@@ -38,17 +38,17 @@ function ResultsTable() {
             </thead>
             <tbody>
               {rows.map(result => (
-                <tr key={result.id} className="border-t border-blue-800 hover:bg-blue-800 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-yellow-300">
+                <tr key={result.id} className="border-t border-gray-100 hover:bg-green-50 transition-colors">
+                  <td className="px-6 py-4 font-semibold text-green-600">
                     {result.place ?? '—'}
                   </td>
                   <td className="px-6 py-4 font-medium">
                     {athleteMap[result.athleteId] ?? `Athlete #${result.athleteId}`}
                   </td>
-                  <td className="px-6 py-4 text-blue-300">
+                  <td className="px-6 py-4 text-gray-500">
                     {meetMap[result.meetId] ?? `Meet #${result.meetId}`}
                   </td>
-                  <td className="px-6 py-4 text-yellow-300">
+                  <td className="px-6 py-4 font-semibold text-green-600">
                     {result.time ?? '—'}
                   </td>
                 </tr>

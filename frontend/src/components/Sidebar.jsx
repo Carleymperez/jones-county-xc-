@@ -9,25 +9,25 @@ const NAV_LINKS = [
 ]
 
 function Sidebar({ onClose }) {
-  const activeClass = 'bg-yellow-400 text-blue-900 font-semibold'
-  const inactiveClass = 'text-blue-200 hover:bg-blue-800'
+  const activeClass = 'bg-green-600 text-white font-semibold'
+  const inactiveClass = 'text-green-300 hover:bg-green-800 hover:text-white'
 
   return (
-    <div className="flex flex-col h-full w-56 bg-blue-950 border-r border-blue-800">
-      <div className="flex items-center justify-between px-4 py-4 border-b border-blue-800">
+    <div className="flex flex-col h-full w-56 bg-green-950 border-r border-green-900">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-green-900">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center shrink-0">
-            <span className="text-blue-800 text-xs font-bold">JC</span>
+          <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-bold">JC</span>
           </div>
           <span className="text-white font-semibold text-sm leading-tight">
             Jones County<br />
-            <span className="text-yellow-400 font-normal">Cross Country</span>
+            <span className="text-green-400 font-normal">Cross Country</span>
           </span>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="text-blue-300 hover:text-white p-1 rounded transition-colors"
+            className="text-green-400 hover:text-white p-1 rounded transition-colors"
             aria-label="Close sidebar"
           >
             <X size={18} />
