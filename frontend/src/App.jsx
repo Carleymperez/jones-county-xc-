@@ -3,6 +3,7 @@ import Header from './components/Header'
 import AthletesTable from './components/AthletesTable'
 import WelcomeBanner from './components/WelcomeBanner'
 import TodayDate from './components/TodayDate'
+import UpcomingMeets from './components/UpcomingMeets'
 
 async function fetchAthletes() {
   const res = await fetch('/api/athletes')
@@ -21,6 +22,7 @@ function App() {
       <WelcomeBanner />
       <Header />
       <TodayDate />
+      <UpcomingMeets />
       <AthletesTable athletes={athletes} isLoading={isLoading} error={error} />
     </div>
   )
