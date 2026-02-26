@@ -16,12 +16,12 @@ const CATEGORIES = [
 
 function RaceCategorySelect({ value, onChange }) {
   return (
-    <div className="flex items-center gap-3">
-      <label className="text-sm font-medium text-gray-600 whitespace-nowrap">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+      <label htmlFor="race-category" className="text-sm font-medium text-gray-600 whitespace-nowrap">
         Race Category
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-48 bg-white border border-gray-300 text-gray-900">
+        <SelectTrigger id="race-category" className="w-full sm:w-48 bg-white border border-gray-300 text-gray-900">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent className="bg-white border border-gray-200 shadow-md">

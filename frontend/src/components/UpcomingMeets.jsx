@@ -7,7 +7,7 @@ const PLACEHOLDER_MEETS = [
 
 function CalendarIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
       <line x1="16" y1="2" x2="16" y2="6" />
       <line x1="8" y1="2" x2="8" y2="6" />
@@ -18,29 +18,30 @@ function CalendarIcon() {
 
 function UpcomingMeets() {
   return (
-    <div className="w-full max-w-2xl px-4 pb-12">
-      <h2 className="text-2xl font-bold tracking-tight text-green-700 mb-4">Upcoming Meets</h2>
-      <div className="flex flex-col gap-3">
+    <section aria-labelledby="upcoming-meets-heading" className="w-full max-w-2xl px-4 pb-12">
+      <h2 id="upcoming-meets-heading" className="text-2xl font-bold tracking-tight text-green-700 mb-4">Upcoming Meets</h2>
+      <ul className="flex flex-col gap-3 list-none">
         {PLACEHOLDER_MEETS.map(meet => (
-          <div
-            key={meet.id}
-            className="bg-white border border-gray-200 border-l-4 border-l-green-500 rounded-xl px-6 py-4 shadow-sm cursor-pointer
-                       hover:shadow-md hover:border-green-500
-                       active:scale-[0.99] transition-all duration-150
-                       flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="min-w-0">
-              <p className="font-semibold text-gray-900 truncate">{meet.name}</p>
-              <p className="text-gray-500 text-sm truncate">{meet.location}</p>
-            </div>
-            <div className="flex items-center gap-1.5 text-green-700 text-sm font-medium shrink-0">
-              <CalendarIcon />
-              {meet.date}
-            </div>
-          </div>
+          <li key={meet.id}>
+            <article
+              aria-label={`${meet.name}, ${meet.date}, ${meet.location}`}
+              className="bg-white border border-gray-200 border-l-4 border-l-green-500 rounded-xl px-6 py-4 shadow-sm
+                         hover:shadow-md transition-shadow duration-150
+                         flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0">
+                <h3 className="font-semibold text-gray-900 truncate">{meet.name}</h3>
+                <p className="text-gray-600 text-sm truncate">{meet.location}</p>
+              </div>
+              <div className="flex items-center gap-1.5 text-green-700 text-sm font-medium shrink-0">
+                <CalendarIcon />
+                <span>{meet.date}</span>
+              </div>
+            </article>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   )
 }
 

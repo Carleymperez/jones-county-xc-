@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { X } from 'lucide-react'
 
 const NAV_LINKS = [
-  { to: '/',        label: 'Home',     end: true },
+  { to: '/',         label: 'Home',     end: true },
   { to: '/athletes', label: 'Athletes' },
   { to: '/meets',    label: 'Meets' },
   { to: '/results',  label: 'Results' },
@@ -11,12 +11,14 @@ const NAV_LINKS = [
 function Sidebar({ onClose }) {
   const activeClass = 'bg-green-600 text-white font-semibold'
   const inactiveClass = 'text-green-300 hover:bg-green-800 hover:text-white'
+  const focusClass = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1 focus-visible:ring-offset-green-950'
 
   return (
-    <div className="flex flex-col h-full w-56 bg-green-950 border-r border-green-900">
+    <aside aria-label="Main navigation" className="flex flex-col h-full w-56 bg-green-950 border-r border-green-900">
       <div className="flex items-center justify-between px-4 py-4 border-b border-green-900">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0">
+          {/* Decorative logo badge — hidden from screen readers */}
+          <div aria-hidden="true" className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-bold">JC</span>
           </div>
           <span className="text-white font-semibold text-sm leading-tight">
@@ -27,15 +29,15 @@ function Sidebar({ onClose }) {
         {onClose && (
           <button
             onClick={onClose}
-            className="text-green-400 hover:text-white p-1 rounded transition-colors"
-            aria-label="Close sidebar"
+            aria-label="Close navigation"
+            className={`text-green-400 hover:text-white p-1 rounded transition-colors ${focusClass}`}
           >
             <X size={18} />
           </button>
         )}
       </div>
 
-      <nav className="flex flex-col gap-1 px-2 py-4">
+      <nav aria-label="Site navigation" className="flex flex-col gap-1 px-2 py-4">
         {NAV_LINKS.map(({ to, label, end }) => (
           <NavLink
             key={to}
@@ -43,14 +45,14 @@ function Sidebar({ onClose }) {
             end={end}
             onClick={onClose}
             className={({ isActive }) =>
-              `block px-4 py-2 rounded-md text-sm transition-colors ${isActive ? activeClass : inactiveClass}`
+              `block px-4 py-2 rounded-md text-sm transition-colors ${focusClass} ${isActive ? activeClass : inactiveClass}`
             }
           >
             {label}
           </NavLink>
         ))}
       </nav>
-    </div>
+    </aside>
   )
 }
 

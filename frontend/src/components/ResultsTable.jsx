@@ -19,36 +19,39 @@ function ResultsTable() {
     <div className="w-full max-w-2xl px-4 pb-12">
       <h2 className="text-2xl font-bold tracking-tight text-green-700 mb-4">Results</h2>
 
-      {isLoading && <p className="text-gray-400">Loading results...</p>}
+      {isLoading && (
+        <p role="status" aria-live="polite" className="text-gray-600">Loading results...</p>
+      )}
 
       {!isLoading && rows.length === 0 && (
-        <p className="text-gray-400">No results recorded yet.</p>
+        <p role="status" aria-live="polite" className="text-gray-600">No results recorded yet.</p>
       )}
 
       {rows.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <table className="w-full text-left">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm overflow-x-auto">
+          <table className="w-full text-left min-w-[480px]">
+            <caption className="sr-only">Race results sorted by place</caption>
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-green-700 text-xs uppercase tracking-wider">
-                <th className="px-6 py-3">Place</th>
-                <th className="px-6 py-3">Athlete</th>
-                <th className="px-6 py-3">Meet</th>
-                <th className="px-6 py-3">Time</th>
+                <th scope="col" className="px-3 sm:px-6 py-3">Place</th>
+                <th scope="col" className="px-3 sm:px-6 py-3">Athlete</th>
+                <th scope="col" className="px-3 sm:px-6 py-3">Meet</th>
+                <th scope="col" className="px-3 sm:px-6 py-3">Time</th>
               </tr>
             </thead>
             <tbody>
               {rows.map(result => (
                 <tr key={result.id} className="border-t border-gray-100 hover:bg-green-50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-green-600">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-green-600">
                     {result.place ?? '—'}
                   </td>
-                  <td className="px-6 py-4 font-medium">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-gray-900">
                     {athleteMap[result.athleteId] ?? `Athlete #${result.athleteId}`}
                   </td>
-                  <td className="px-6 py-4 text-gray-500">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600">
                     {meetMap[result.meetId] ?? `Meet #${result.meetId}`}
                   </td>
-                  <td className="px-6 py-4 font-semibold text-green-600">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-green-600">
                     {result.time ?? '—'}
                   </td>
                 </tr>
