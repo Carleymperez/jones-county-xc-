@@ -17,19 +17,25 @@ function CalendarIcon() {
   )
 }
 
-function MeetSkeleton() {
+// Mirrors the exact shape of a meet card
+function MeetCardSkeleton() {
   return (
-    <ul aria-label="Loading meets" className="flex flex-col gap-3">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <li key={i} aria-hidden="true" className="bg-white border border-gray-200 border-l-4 border-l-green-200 rounded-xl px-6 py-4 animate-pulse flex flex-col sm:flex-row sm:justify-between gap-3">
-          <div className="flex flex-col gap-2">
-            <div className="h-4 bg-gray-200 rounded w-48" />
-            <div className="h-3 bg-gray-100 rounded w-36" />
-          </div>
-          <div className="h-4 bg-gray-200 rounded w-32 shrink-0" />
-        </li>
-      ))}
-    </ul>
+    <div aria-hidden="true"
+      className="bg-white border border-gray-200 border-l-4 border-l-green-200 rounded-xl px-6 py-4 shadow-sm animate-pulse
+                 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div className="flex flex-col gap-2 min-w-0">
+        {/* Meet name */}
+        <div className="h-4 bg-gray-200 rounded w-44" />
+        {/* Location */}
+        <div className="h-3 bg-gray-100 rounded w-32" />
+      </div>
+      {/* Calendar icon + date */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        <div className="w-4 h-4 bg-gray-200 rounded shrink-0" />
+        <div className="h-3 bg-gray-200 rounded w-28" />
+      </div>
+    </div>
   )
 }
 
@@ -39,11 +45,21 @@ function UpcomingMeets() {
     queryFn: fetchMeets,
   })
 
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const upcomingMeets = meets
+    .filter(meet => new Date(meet.date) >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+
   return (
     <section aria-labelledby="upcoming-meets-heading" className="w-full max-w-2xl px-4 pb-12">
       <h2 id="upcoming-meets-heading" className="text-2xl font-bold tracking-tight text-green-700 mb-4">Upcoming Meets</h2>
 
-      {isPending && <MeetSkeleton />}
+      {isPending && (
+        <ul className="flex flex-col gap-3 list-none">
+          {Array.from({ length: 3 }).map((_, i) => <li key={i}><MeetCardSkeleton /></li>)}
+        </ul>
+      )}
 
       {isError && (
         <div role="alert" className="bg-red-50 border border-red-200 rounded-xl px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -62,13 +78,13 @@ function UpcomingMeets() {
         </div>
       )}
 
-      {!isPending && !isError && meets.length === 0 && (
+      {!isPending && !isError && upcomingMeets.length === 0 && (
         <p role="status" className="text-gray-500">No upcoming meets scheduled.</p>
       )}
 
-      {!isPending && !isError && meets.length > 0 && (
-        <ul className="flex flex-col gap-3 list-none">
-          {meets.map(meet => (
+      {!isPending && !isError && upcomingMeets.length > 0 && (
+        <ul className="flex flex-col gap-3 list-none animate-in fade-in duration-300">
+          {upcomingMeets.map(meet => (
             <li key={meet.id}>
               <article
                 aria-label={`${meet.name}, ${meet.date}, ${meet.location}`}

@@ -6,6 +6,7 @@ async function fetchData(url) {
   return res.json()
 }
 
+// Generic list-item skeleton: left accent bar + two text lines
 function LoadingSkeleton() {
   return (
     <ul aria-label="Loading" className="flex flex-col gap-3">
@@ -13,10 +14,12 @@ function LoadingSkeleton() {
         <li
           key={i}
           aria-hidden="true"
-          className="bg-white border border-gray-200 rounded-xl px-5 py-4 shadow-sm animate-pulse flex flex-col gap-2"
+          className="bg-white border border-gray-200 border-l-4 border-l-gray-200 rounded-xl px-5 py-4 shadow-sm animate-pulse"
         >
-          <div className="h-4 bg-gray-200 rounded w-2/5" />
-          <div className="h-3 bg-gray-100 rounded w-3/5" />
+          <div className="flex flex-col gap-2">
+            <div className="h-4 bg-gray-200 rounded w-2/5" />
+            <div className="h-3 bg-gray-100 rounded w-3/5" />
+          </div>
         </li>
       ))}
     </ul>
@@ -42,14 +45,6 @@ function ErrorState({ message, onRetry }) {
         Try again
       </button>
     </div>
-  )
-}
-
-function EmptyState({ label }) {
-  return (
-    <p role="status" className="text-gray-500 text-sm py-4">
-      No {label ?? 'items'} found.
-    </p>
   )
 }
 
@@ -79,16 +74,16 @@ function ApiList({ url, queryKey, renderItem, emptyLabel, heading }) {
 
       {isPending && <LoadingSkeleton />}
 
-      {isError && (
-        <ErrorState message={error.message} onRetry={refetch} />
-      )}
+      {isError && <ErrorState message={error.message} onRetry={refetch} />}
 
       {!isPending && !isError && data.length === 0 && (
-        <EmptyState label={emptyLabel} />
+        <p role="status" className="text-gray-500 text-sm py-4">
+          No {emptyLabel ?? 'items'} found.
+        </p>
       )}
 
       {!isPending && !isError && data.length > 0 && (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-3 animate-in fade-in duration-300">
           {data.map((item, index) => (
             <li key={item.id ?? index}>
               {renderItem(item)}

@@ -4,19 +4,28 @@ async function fetchResults()  { const r = await fetch('/api/results');  if (!r.
 async function fetchAthletes() { const r = await fetch('/api/athletes'); if (!r.ok) throw new Error('Failed to fetch athletes'); return r.json() }
 async function fetchMeets()    { const r = await fetch('/api/meets');    if (!r.ok) throw new Error('Failed to fetch meets');    return r.json() }
 
+// Column widths mirror the real table: Place(small) | Athlete(med) | Meet(large) | Time(small)
+const COL_WIDTHS = {
+  header: ['w-10', 'w-28', 'w-40', 'w-16'],
+  rows:   ['w-8',  'w-24', 'w-36', 'w-14'],
+}
+
 function TableSkeleton() {
   return (
     <div aria-hidden="true" className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm animate-pulse">
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-3 flex gap-6">
-        {['w-12', 'w-32', 'w-40', 'w-20'].map((w, i) => (
+      {/* Header row */}
+      <div className="bg-gray-50 border-b border-gray-200 px-6 py-3 flex items-center gap-6">
+        {COL_WIDTHS.header.map((w, i) => (
           <div key={i} className={`h-3 bg-gray-200 rounded ${w}`} />
         ))}
       </div>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="border-t border-gray-100 px-6 py-4 flex gap-6">
-          {['w-8', 'w-28', 'w-36', 'w-16'].map((w, j) => (
-            <div key={j} className={`h-4 bg-gray-100 rounded ${w}`} />
-          ))}
+      {/* Body rows */}
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="border-t border-gray-100 px-6 py-4 flex items-center gap-6">
+          <div className={`h-4 bg-gray-200 rounded font-semibold ${COL_WIDTHS.rows[0]}`} />
+          <div className={`h-4 bg-gray-200 rounded ${COL_WIDTHS.rows[1]}`} />
+          <div className={`h-3 bg-gray-100 rounded ${COL_WIDTHS.rows[2]}`} />
+          <div className={`h-4 bg-gray-200 rounded ${COL_WIDTHS.rows[3]}`} />
         </div>
       ))}
     </div>
@@ -62,7 +71,7 @@ function ResultsTable() {
       )}
 
       {!isPending && !rError && rows.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm overflow-x-auto">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm overflow-x-auto animate-in fade-in duration-300">
           <table className="w-full text-left min-w-[480px]">
             <caption className="sr-only">Race results sorted by place</caption>
             <thead>
