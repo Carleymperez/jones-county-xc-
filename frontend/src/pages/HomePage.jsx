@@ -4,7 +4,7 @@ import WelcomeBanner from '../components/WelcomeBanner'
 
 function HomePage() {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <WelcomeBanner />
       <Header />
       <TodayDate />

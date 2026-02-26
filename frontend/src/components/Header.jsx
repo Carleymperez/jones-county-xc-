@@ -1,14 +1,15 @@
 function Header() {
   return (
-    <div className="flex flex-col items-center mt-12 mb-10">
-      <div className="w-20 h-20 rounded-full bg-green-600 flex items-center justify-center mb-6 shadow-lg">
-        <span className="text-white text-2xl font-bold">JC</span>
+    <div className="w-full bg-gradient-to-br from-green-950 via-green-800 to-green-600 py-24 px-6 flex flex-col items-center text-center">
+      <div className="w-24 h-24 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center mb-8 shadow-xl">
+        <span className="text-white text-3xl font-extrabold">JC</span>
       </div>
-      <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-center mb-2">
-        <span className="text-green-600">Jones County</span>{' '}
-        <span className="text-yellow-500">Cross Country</span>
+      <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-none">
+        <span className="text-white">Jones County</span>
+        <br />
+        <span className="text-yellow-400">Cross Country</span>
       </h1>
-      <p className="text-gray-500 text-lg text-center max-w-md">
+      <p className="text-green-100 text-xl sm:text-2xl max-w-xl mt-4 font-light">
         Building endurance, character, and team pride — one mile at a time.
       </p>
     </div>
