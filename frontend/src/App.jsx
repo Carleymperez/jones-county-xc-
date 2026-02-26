@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import Header from './components/Header'
-import AthletesTable from './components/AthletesTable'
+import AthleteCard from './components/AthleteCard'
 import WelcomeBanner from './components/WelcomeBanner'
 import TodayDate from './components/TodayDate'
 import UpcomingMeets from './components/UpcomingMeets'
@@ -24,7 +24,16 @@ function App() {
       <Header />
       <TodayDate />
       <UpcomingMeets />
-      <AthletesTable athletes={athletes} isLoading={isLoading} error={error} />
+      <div className="w-full max-w-2xl px-4 pb-12">
+        <h2 className="text-2xl font-semibold text-yellow-400 mb-4">Athletes</h2>
+        {isLoading && <p className="text-blue-200">Loading athletes...</p>}
+        {error && <p className="text-red-300">Error: {error.message}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {athletes.map(a => (
+            <AthleteCard key={a.id} name={a.name} grade={a.grade} time={a.personal_record} />
+          ))}
+        </div>
+      </div>
       <ResultsTable />
     </div>
   )
