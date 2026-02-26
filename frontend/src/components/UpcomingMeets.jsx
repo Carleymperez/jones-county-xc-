@@ -1,9 +1,10 @@
-const PLACEHOLDER_MEETS = [
-  { id: 1, name: 'Jaguar Invitational',       date: 'September 6, 2025',  location: 'Laurel Hill Park, Laurel, MS' },
-  { id: 2, name: 'Pine Belt Classic',          date: 'September 20, 2025', location: 'Lake Thoreau, Hattiesburg, MS' },
-  { id: 3, name: 'Jones County Invitational',  date: 'October 4, 2025',    location: 'Jones County Junior College' },
-  { id: 4, name: 'MHSAA 5A South State',       date: 'October 25, 2025',   location: 'Biloxi, MS' },
-]
+import { useQuery } from '@tanstack/react-query'
+
+async function fetchMeets() {
+  const res = await fetch('/api/meets')
+  if (!res.ok) throw new Error('Failed to fetch meets')
+  return res.json()
+}
 
 function CalendarIcon() {
   return (
@@ -16,31 +17,78 @@ function CalendarIcon() {
   )
 }
 
+function MeetSkeleton() {
+  return (
+    <ul aria-label="Loading meets" className="flex flex-col gap-3">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <li key={i} aria-hidden="true" className="bg-white border border-gray-200 border-l-4 border-l-green-200 rounded-xl px-6 py-4 animate-pulse flex flex-col sm:flex-row sm:justify-between gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="h-4 bg-gray-200 rounded w-48" />
+            <div className="h-3 bg-gray-100 rounded w-36" />
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-32 shrink-0" />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function UpcomingMeets() {
+  const { data: meets = [], isPending, isError, error, refetch } = useQuery({
+    queryKey: ['meets'],
+    queryFn: fetchMeets,
+  })
+
   return (
     <section aria-labelledby="upcoming-meets-heading" className="w-full max-w-2xl px-4 pb-12">
       <h2 id="upcoming-meets-heading" className="text-2xl font-bold tracking-tight text-green-700 mb-4">Upcoming Meets</h2>
-      <ul className="flex flex-col gap-3 list-none">
-        {PLACEHOLDER_MEETS.map(meet => (
-          <li key={meet.id}>
-            <article
-              aria-label={`${meet.name}, ${meet.date}, ${meet.location}`}
-              className="bg-white border border-gray-200 border-l-4 border-l-green-500 rounded-xl px-6 py-4 shadow-sm
-                         hover:shadow-md transition-shadow duration-150
-                         flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="min-w-0">
-                <h3 className="font-semibold text-gray-900 truncate">{meet.name}</h3>
-                <p className="text-gray-600 text-sm truncate">{meet.location}</p>
-              </div>
-              <div className="flex items-center gap-1.5 text-green-700 text-sm font-medium shrink-0">
-                <CalendarIcon />
-                <span>{meet.date}</span>
-              </div>
-            </article>
-          </li>
-        ))}
-      </ul>
+
+      {isPending && <MeetSkeleton />}
+
+      {isError && (
+        <div role="alert" className="bg-red-50 border border-red-200 rounded-xl px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="font-semibold text-red-700">Failed to load meets</p>
+            <p className="text-red-600 text-sm mt-1">{error.message}</p>
+          </div>
+          <button
+            onClick={() => refetch()}
+            className="shrink-0 bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg
+                       hover:bg-red-700 transition-colors
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!isPending && !isError && meets.length === 0 && (
+        <p role="status" className="text-gray-500">No upcoming meets scheduled.</p>
+      )}
+
+      {!isPending && !isError && meets.length > 0 && (
+        <ul className="flex flex-col gap-3 list-none">
+          {meets.map(meet => (
+            <li key={meet.id}>
+              <article
+                aria-label={`${meet.name}, ${meet.date}, ${meet.location}`}
+                className="bg-white border border-gray-200 border-l-4 border-l-green-500 rounded-xl px-6 py-4 shadow-sm
+                           hover:shadow-md transition-shadow duration-150
+                           flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-gray-900 truncate">{meet.name}</h3>
+                  <p className="text-gray-600 text-sm truncate">{meet.location}</p>
+                </div>
+                <div className="flex items-center gap-1.5 text-green-700 text-sm font-medium shrink-0">
+                  <CalendarIcon />
+                  <span>{meet.date}</span>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
