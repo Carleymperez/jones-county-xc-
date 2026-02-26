@@ -24,7 +24,7 @@ function RaceCategorySelect({ value, onChange }) {
         <SelectTrigger className="w-48 bg-white border border-gray-300 text-gray-900">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white border border-gray-200 shadow-md">
           {CATEGORIES.map(cat => (
             <SelectItem key={cat.value} value={cat.value}>
               {cat.label}
