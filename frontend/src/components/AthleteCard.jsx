@@ -25,7 +25,7 @@ function AthleteCard({ name, grade, time }) {
         <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">5K PR</span>
         <span className="text-lg font-semibold">{time}</span>
       </div>
-      <Button variant="outline" size="sm" className="w-full">View Details</Button>
+      <Button variant="outline" size="sm" className="w-full border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-gray-900">View Details</Button>
     </div>
   )
 }
