@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	_ "modernc.org/sqlite"
 
@@ -58,12 +59,9 @@ var database *sql.DB
 
 const adminUsername = "admin"
 const adminPlainPassword = "greyhounds2025"
+const tokenSecret = "jcxc-admin-secret-2025"
 
-var (
-	adminHash []byte
-	tokens    = make(map[string]bool)
-	tokensMu  sync.RWMutex
-)
+var adminHash []byte
 
 func initAuth() {
 	hash, err := bcrypt.GenerateFromPassword([]byte(adminPlainPassword), bcrypt.DefaultCost)
@@ -72,6 +70,19 @@ func initAuth() {
 	}
 	adminHash = hash
 	log.Println("Auth initialized")
+}
+
+// generateToken returns a deterministic HMAC token for a username.
+// The same token is produced every time, so it survives server restarts.
+func generateToken(username string) string {
+	mac := hmac.New(sha256.New, []byte(tokenSecret))
+	mac.Write([]byte(username))
+	return hex.EncodeToString(mac.Sum(nil))
+}
+
+func validateToken(token string) bool {
+	expected := generateToken(adminUsername)
+	return hmac.Equal([]byte(token), []byte(expected))
 }
 
 func Login(c *gin.Context) {
@@ -93,12 +104,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token := uuid.NewString()
-	tokensMu.Lock()
-	tokens[token] = true
-	tokensMu.Unlock()
-
-	c.JSON(200, gin.H{"token": token})
+	c.JSON(200, gin.H{"token": generateToken(adminUsername)})
 }
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -109,10 +115,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		token := strings.TrimPrefix(header, "Bearer ")
-		tokensMu.RLock()
-		valid := tokens[token]
-		tokensMu.RUnlock()
-		if !valid {
+		if !validateToken(token) {
 			c.AbortWithStatusJSON(401, gin.H{"message": "unauthorized"})
 			return
 		}
