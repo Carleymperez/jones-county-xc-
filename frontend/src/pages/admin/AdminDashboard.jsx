@@ -23,7 +23,27 @@ async function apiFetch(url, token) {
   return res.json()
 }
 
+// ─── Shared helpers ──────────────────────────────────────────────────────────
+
+async function parseError(res) {
+  const text = await res.text()
+  try {
+    const data = JSON.parse(text)
+    return data.error ?? data.message ?? text
+  } catch {
+    return text || 'Something went wrong'
+  }
+}
+
 // ─── Icons ───────────────────────────────────────────────────────────────────
+
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
 
 function PencilIcon() {
   return (
@@ -49,6 +69,18 @@ function PlusIcon() {
     <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
       <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
     </svg>
+  )
+}
+
+// ─── Success banner ───────────────────────────────────────────────────────────
+
+function SuccessBanner({ message }) {
+  if (!message) return null
+  return (
+    <div role="status" className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg animate-in fade-in duration-200">
+      <CheckIcon />
+      {message}
+    </div>
   )
 }
 
@@ -155,6 +187,7 @@ function AthletesTab({ token }) {
   const [modal, setModal] = useState(null) // { mode: 'add'|'edit', item }
   const [form, setForm] = useState(EMPTY_ATHLETE)
   const [formError, setFormError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   const { data: athletes = [], isPending } = useQuery({
     queryKey: ['athletes'],
@@ -166,9 +199,15 @@ function AthletesTab({ token }) {
       const isEdit = modal?.mode === 'edit'
       const url = isEdit ? `/api/athletes/${modal.item.id}` : '/api/athletes'
       const res = await authFetch(url, { method: isEdit ? 'PUT' : 'POST', body: JSON.stringify(data) }, token)
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) throw new Error(await parseError(res))
+      return isEdit ? 'updated' : 'added'
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['athletes'] }); closeModal() },
+    onSuccess: (action) => {
+      qc.invalidateQueries({ queryKey: ['athletes'] })
+      closeModal()
+      setSuccessMsg(`Athlete ${action} successfully.`)
+      setTimeout(() => setSuccessMsg(''), 4000)
+    },
     onError: (err) => setFormError(err.message),
   })
 
@@ -211,6 +250,7 @@ function AthletesTab({ token }) {
           <PlusIcon /> Add Athlete
         </button>
       </div>
+      <SuccessBanner message={successMsg} />
 
       {isPending
         ? <TableSkeleton cols={3} />
@@ -258,6 +298,7 @@ function MeetsTab({ token }) {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState(EMPTY_MEET)
   const [formError, setFormError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   const { data: meets = [], isPending } = useQuery({
     queryKey: ['meets'],
@@ -269,9 +310,15 @@ function MeetsTab({ token }) {
       const isEdit = modal?.mode === 'edit'
       const url = isEdit ? `/api/meets/${modal.item.id}` : '/api/meets'
       const res = await authFetch(url, { method: isEdit ? 'PUT' : 'POST', body: JSON.stringify(data) }, token)
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) throw new Error(await parseError(res))
+      return isEdit ? 'updated' : 'added'
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['meets'] }); closeModal() },
+    onSuccess: (action) => {
+      qc.invalidateQueries({ queryKey: ['meets'] })
+      closeModal()
+      setSuccessMsg(`Meet ${action} successfully.`)
+      setTimeout(() => setSuccessMsg(''), 4000)
+    },
     onError: (err) => setFormError(err.message),
   })
 
@@ -311,6 +358,7 @@ function MeetsTab({ token }) {
           <PlusIcon /> Add Meet
         </button>
       </div>
+      <SuccessBanner message={successMsg} />
 
       {isPending
         ? <TableSkeleton cols={3} />
@@ -358,6 +406,7 @@ function ResultsTab({ token }) {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState(EMPTY_RESULT)
   const [formError, setFormError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   const { data: results  = [], isPending: rPending } = useQuery({ queryKey: ['results'],  queryFn: () => apiFetch('/api/results', token) })
   const { data: athletes = [] }                       = useQuery({ queryKey: ['athletes'], queryFn: () => apiFetch('/api/athletes', token) })
@@ -371,9 +420,15 @@ function ResultsTab({ token }) {
       const isEdit = modal?.mode === 'edit'
       const url = isEdit ? `/api/results/${modal.item.id}` : '/api/results'
       const res = await authFetch(url, { method: isEdit ? 'PUT' : 'POST', body: JSON.stringify(data) }, token)
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) throw new Error(await parseError(res))
+      return isEdit ? 'updated' : 'added'
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['results'] }); closeModal() },
+    onSuccess: (action) => {
+      qc.invalidateQueries({ queryKey: ['results'] })
+      closeModal()
+      setSuccessMsg(`Result ${action} successfully.`)
+      setTimeout(() => setSuccessMsg(''), 4000)
+    },
     onError: (err) => setFormError(err.message),
   })
 
@@ -417,6 +472,7 @@ function ResultsTab({ token }) {
           <PlusIcon /> Add Result
         </button>
       </div>
+      <SuccessBanner message={successMsg} />
 
       {rPending
         ? <TableSkeleton cols={4} />
