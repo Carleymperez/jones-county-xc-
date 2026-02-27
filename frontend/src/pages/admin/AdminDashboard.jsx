@@ -193,7 +193,10 @@ function AthletesTab({ token }) {
   function handleSubmit(e) {
     e.preventDefault()
     setFormError('')
-    saveMutation.mutate(form)
+    saveMutation.mutate({
+      ...form,
+      grade: form.grade !== '' ? Number(form.grade) : null,
+    })
   }
 
   return (
