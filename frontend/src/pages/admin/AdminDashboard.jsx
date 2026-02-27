@@ -589,13 +589,22 @@ function AdminDashboard() {
             <p className="text-green-400 text-xs">Admin Dashboard</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-green-300 hover:text-white text-sm font-medium transition-colors
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 rounded px-2 py-1"
-        >
-          Sign out
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/"
+            className="text-green-300 hover:text-white text-sm font-medium transition-colors
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 rounded px-2 py-1"
+          >
+            ← View site
+          </a>
+          <button
+            onClick={handleLogout}
+            className="text-green-300 hover:text-white text-sm font-medium transition-colors
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 rounded px-2 py-1"
+          >
+            Sign out
+          </button>
+        </div>
       </header>
 
       {/* Tab bar */}
