@@ -1,5 +1,6 @@
 import Header from '../components/Header'
 import WelcomeBanner from '../components/WelcomeBanner'
+import UpcomingMeets from '../components/UpcomingMeets'
 import teamPhoto from '../assets/team-photo.png'
 
 function HomePage() {
@@ -15,6 +16,9 @@ function HomePage() {
             className="w-full rounded-2xl shadow-2xl object-cover"
           />
         </section>
+      </div>
+      <div className="w-full flex flex-col items-center py-8">
+        <UpcomingMeets />
       </div>
     </div>
   )
